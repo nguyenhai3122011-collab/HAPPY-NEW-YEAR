@@ -30,10 +30,11 @@
             text-align: center;
             z-index: 10;
             pointer-events: none;
+            width: 90%; /* Giới hạn chiều rộng trên màn nhỏ */
+            max-width: 1200px;
         }
         .main-text {
             font-family: 'Dancing Script', cursive;
-            font-size: 5.8rem;
             font-weight: 700;
             margin: 0;
             background: linear-gradient(90deg, #ff0000, #ff8800, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
@@ -42,10 +43,14 @@
             -webkit-text-fill-color: transparent;
             animation: rainbow 8s linear infinite, glow 3s ease-in-out infinite alternate;
             text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+
+            /* Responsive font size */
+            font-size: clamp(2.5rem, 10vw, 6.5rem); /* Tối thiểu 2.5rem, tối đa 6.5rem, tự động điều chỉnh theo viewport */
+            line-height: 1.1;
         }
         .sub-text {
-            font-size: 2.3rem;
-            margin-top: 20px;
+            font-size: clamp(1.2rem, 5vw, 2.5rem); /* Tự động co giãn */
+            margin-top: 1.5rem;
             font-weight: 400;
             color: #ffffff;
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
@@ -57,6 +62,16 @@
         @keyframes glow {
             from { text-shadow: 0 0 20px #fff, 0 0 40px #fff; }
             to { text-shadow: 0 0 30px #fff, 0 0 60px #ff0, 0 0 80px #ff0; }
+        }
+
+        /* Tối ưu thêm cho điện thoại nhỏ */
+        @media (max-width: 480px) {
+            .main-text {
+                font-size: clamp(2rem, 9vw, 4.5rem);
+            }
+            .sub-text {
+                font-size: clamp(1rem, 4.5vw, 2rem);
+            }
         }
     </style>
 </head>
@@ -70,29 +85,39 @@
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
 
-        window.addEventListener('resize', () => {
+        function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-        });
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
 
         let fireworks = [];
         let particles = [];
         let stars = [];
         let time = 0;
 
-        // 120 ngôi sao lấp lánh
-        for (let i = 0; i < 120; i++) {
-            stars.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height * 0.7,
-                radius: Math.random() * 1.3 + 0.5,
-                alpha: Math.random() * 0.6 + 0.4,
-                twinkleSpeed: Math.random() * 0.03 + 0.01
-            });
+        // Tạo ngôi sao (sẽ tự điều chỉnh khi resize)
+        function createStars() {
+            stars = [];
+            for (let i = 0; i < 120; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height * 0.7,
+                    radius: Math.random() * 1.3 + 0.5,
+                    alpha: Math.random() * 0.6 + 0.4,
+                    twinkleSpeed: Math.random() * 0.03 + 0.01
+                });
+            }
         }
+        createStars();
+
+        // Resize cũng tạo lại ngôi sao để phân bố đều
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            createStars();
+        });
 
         function random(min, max) {
             return Math.random() * (max - min) + min;
@@ -152,7 +177,7 @@
                 lastAutoFirework = Date.now();
             }
 
-            // Rocket bay nhanh - KHÔNG CÓ BÓNG
+            // Rocket
             fireworks = fireworks.filter(fw => {
                 fw.y -= fw.speed;
                 ctx.fillStyle = '#ffff99';
@@ -165,13 +190,13 @@
                 return true;
             });
 
-            // Particles - KHÔNG CÓ BÓNG, sạch sẽ và nhẹ hơn
+            // Particles
             particles = particles.filter(p => {
                 p.trail.push({ x: p.x, y: p.y });
                 if (p.trail.length > p.trailLength) p.trail.shift();
 
                 p.trail.forEach((point, i) => {
-                    ctx.globalAlpha = (i / p.trail.length) * 0.4 * p.alpha;
+                    ctx.globalAlpha = (i / p.trailLength) * 0.4 * p.alpha;
                     ctx.fillStyle = p.color;
                     ctx.fillRect(point.x - 1, point.y - 1, 2, 2);
                 });
@@ -194,7 +219,6 @@
             requestAnimationFrame(animate);
         }
 
-        // Click để bắn pháo hoa nhanh
         canvas.addEventListener('click', e => {
             const rect = canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;

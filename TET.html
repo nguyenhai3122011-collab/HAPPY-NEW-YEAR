@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chúc Mừng Năm Mới 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #000000, #000033);
+            font-family: 'Roboto', sans-serif;
+            color: white;
+        }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .main-text {
+            font-family: 'Dancing Script', cursive;
+            font-size: 5.8rem;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(90deg, #ff0000, #ff8800, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rainbow 8s linear infinite, glow 3s ease-in-out infinite alternate;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+        }
+        .sub-text {
+            font-size: 2.3rem;
+            margin-top: 20px;
+            font-weight: 400;
+            color: #ffffff;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+        }
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+        @keyframes glow {
+            from { text-shadow: 0 0 20px #fff, 0 0 40px #fff; }
+            to { text-shadow: 0 0 30px #fff, 0 0 60px #ff0, 0 0 80px #ff0; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <div class="message">
+        <h1 class="main-text">Chúc Mừng Năm Mới<br>2026</h1>
+        <div class="sub-text">Hạnh Phúc • An Khang • Thịnh Vượng</div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        let fireworks = [];
+        let particles = [];
+        let stars = [];
+        let time = 0;
+
+        // 120 ngôi sao lấp lánh
+        for (let i = 0; i < 120; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height * 0.7,
+                radius: Math.random() * 1.3 + 0.5,
+                alpha: Math.random() * 0.6 + 0.4,
+                twinkleSpeed: Math.random() * 0.03 + 0.01
+            });
+        }
+
+        function random(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        function createFirework() {
+            const x = random(200, canvas.width - 200);
+            const targetY = random(100, canvas.height * 0.4);
+            const color = `hsl(${random(0, 360)}, 100%, 60%)`;
+            fireworks.push({ 
+                x, 
+                y: canvas.height, 
+                targetY, 
+                color, 
+                speed: random(10, 15)  // TĂNG TỐC ĐỘ BAY LÊN RẤT NHANH
+            });
+        }
+
+        function explode(firework) {
+            const count = Math.floor(random(30, 50));
+            for (let i = 0; i < count; i++) {
+                const angle = (Math.PI * 2 * i) / count + random(-0.2, 0.2);
+                const velocity = random(4, 9);  // TĂNG TỐC ĐỘ VĂNG RA MẠNH HƠN
+                particles.push({
+                    x: firework.x,
+                    y: firework.targetY,
+                    vx: Math.cos(angle) * velocity,
+                    vy: Math.sin(angle) * velocity,
+                    color: firework.color,
+                    alpha: 1,
+                    radius: random(1.5, 3),
+                    trail: [],
+                    trailLength: 5  // Trail dài hơn một chút để đẹp khi bay nhanh
+                });
+            }
+        }
+
+        let lastAutoFirework = 0;
+
+        function animate() {
+            time++;
+            ctx.fillStyle = 'rgba(0, 0, 20, 0.08)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Ngôi sao lấp lánh
+            stars.forEach(star => {
+                const twinkle = Math.sin(time * star.twinkleSpeed) * 0.3 + 0.7;
+                ctx.globalAlpha = star.alpha * twinkle;
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(star.x - star.radius, star.y - star.radius, star.radius * 2, star.radius * 2);
+            });
+            ctx.globalAlpha = 1;
+
+            // Pháo hoa tự động (vẫn thưa để giữ mượt)
+            if (Date.now() - lastAutoFirework > random(4500, 6500)) {
+                createFirework();
+                lastAutoFirework = Date.now();
+            }
+
+            // Rocket bay siêu nhanh
+            fireworks = fireworks.filter(fw => {
+                fw.y -= fw.speed;
+                ctx.fillStyle = '#ffff99';
+                ctx.fillRect(fw.x - 2, fw.y, 4, 12);  // Đuôi rocket dài hơn cho cảm giác nhanh
+
+                if (fw.y <= fw.targetY) {
+                    explode(fw);
+                    return false;
+                }
+                return true;
+            });
+
+            // Particles bay mạnh và nhanh
+            particles = particles.filter(p => {
+                p.trail.push({ x: p.x, y: p.y });
+                if (p.trail.length > p.trailLength) p.trail.shift();
+
+                p.trail.forEach((point, i) => {
+                    ctx.globalAlpha = (i / p.trail.length) * 0.4 * p.alpha;
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(point.x - 1, point.y - 1, 2, 2);
+                });
+
+                p.vy += 0.04;  // Gravity nhẹ hơn → bay xa hơn
+                p.vx *= 0.98;
+                p.vy *= 0.98;
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= 0.012;
+
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x - p.radius, p.y - p.radius, p.radius * 2, p.radius * 2);
+
+                return p.alpha > 0;
+            });
+
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(animate);
+        }
+
+        // Click để bắn pháo hoa siêu nhanh
+        canvas.addEventListener('click', e => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const targetY = e.clientY - rect.top - 50;
+            fireworks.push({
+                x,
+                y: canvas.height,
+                targetY: Math.max(100, targetY),
+                color: `hsl(${random(0, 360)}, 100%, 60%)`,
+                speed: random(12, 18)  // Click thì còn nhanh hơn nữa!
+            });
+        });
+
+        animate();
+    </script>
+</body>
+</html>

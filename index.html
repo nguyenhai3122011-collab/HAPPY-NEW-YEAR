@@ -107,7 +107,7 @@
                 y: canvas.height, 
                 targetY, 
                 color, 
-                speed: random(10, 15)  // TĂNG TỐC ĐỘ BAY LÊN RẤT NHANH
+                speed: random(10, 15)
             });
         }
 
@@ -115,7 +115,7 @@
             const count = Math.floor(random(30, 50));
             for (let i = 0; i < count; i++) {
                 const angle = (Math.PI * 2 * i) / count + random(-0.2, 0.2);
-                const velocity = random(4, 9);  // TĂNG TỐC ĐỘ VĂNG RA MẠNH HƠN
+                const velocity = random(4, 9);
                 particles.push({
                     x: firework.x,
                     y: firework.targetY,
@@ -125,7 +125,7 @@
                     alpha: 1,
                     radius: random(1.5, 3),
                     trail: [],
-                    trailLength: 5  // Trail dài hơn một chút để đẹp khi bay nhanh
+                    trailLength: 5
                 });
             }
         }
@@ -146,17 +146,17 @@
             });
             ctx.globalAlpha = 1;
 
-            // Pháo hoa tự động (vẫn thưa để giữ mượt)
+            // Pháo hoa tự động
             if (Date.now() - lastAutoFirework > random(4500, 6500)) {
                 createFirework();
                 lastAutoFirework = Date.now();
             }
 
-            // Rocket bay siêu nhanh
+            // Rocket bay nhanh - KHÔNG CÓ BÓNG
             fireworks = fireworks.filter(fw => {
                 fw.y -= fw.speed;
                 ctx.fillStyle = '#ffff99';
-                ctx.fillRect(fw.x - 2, fw.y, 4, 12);  // Đuôi rocket dài hơn cho cảm giác nhanh
+                ctx.fillRect(fw.x - 2, fw.y, 4, 12);
 
                 if (fw.y <= fw.targetY) {
                     explode(fw);
@@ -165,7 +165,7 @@
                 return true;
             });
 
-            // Particles bay mạnh và nhanh
+            // Particles - KHÔNG CÓ BÓNG, sạch sẽ và nhẹ hơn
             particles = particles.filter(p => {
                 p.trail.push({ x: p.x, y: p.y });
                 if (p.trail.length > p.trailLength) p.trail.shift();
@@ -176,7 +176,7 @@
                     ctx.fillRect(point.x - 1, point.y - 1, 2, 2);
                 });
 
-                p.vy += 0.04;  // Gravity nhẹ hơn → bay xa hơn
+                p.vy += 0.04;
                 p.vx *= 0.98;
                 p.vy *= 0.98;
                 p.x += p.vx;
@@ -194,7 +194,7 @@
             requestAnimationFrame(animate);
         }
 
-        // Click để bắn pháo hoa siêu nhanh
+        // Click để bắn pháo hoa nhanh
         canvas.addEventListener('click', e => {
             const rect = canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
@@ -204,7 +204,7 @@
                 y: canvas.height,
                 targetY: Math.max(100, targetY),
                 color: `hsl(${random(0, 360)}, 100%, 60%)`,
-                speed: random(12, 18)  // Click thì còn nhanh hơn nữa!
+                speed: random(12, 18)
             });
         });
 
